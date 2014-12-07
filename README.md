@@ -3,4 +3,4 @@ Clang
 
 Learning clang
 
-haha
+Good Good Study, Day Day Up
