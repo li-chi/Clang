@@ -13,7 +13,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "clang/Lex/lexer.h"
 #include "clang/Lex/Token.h"
-
+#include <stdlib.h>  
 
 using namespace clang;
 using namespace clang::ast_matchers;
@@ -22,30 +22,58 @@ using namespace clang::tooling;
 
 static llvm::cl::OptionCategory MatcherSampleCategory("Matcher Sample");
 
-std::string varName;
-std::string varValue;
+//std::string varName;
+bool counting = true;
+int count = 0;
+int choose;
 
 class VarDeclHandler : public MatchFinder::MatchCallback {
 public:
     VarDeclHandler(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
     virtual void run(const MatchFinder::MatchResult &Result) {
+      const BinaryOperator *bo = Result.Nodes.getNodeAs<clang::BinaryOperator>("bo");
       const VarDecl *vd = Result.Nodes.getNodeAs<clang::VarDecl>("vd");
-      SourceLocation sl = vd->getSourceRange().getBegin();
-        
-        SourceLocation des = sl;
-        while (Lexer::findLocationAfterToken(des, tok::semi, Rewrite.getSourceMgr(), 
+      std::string str;
+
+      if(vd->getType()->isIntegerType()) {
+        if(counting) {
+          count++;
+          return;
+        } else {
+          count++;
+          if(count != choose) {
+            return;
+          }
+        }
+        str = vd->getNameAsString() + " = 10;//wrong value\n//";
+
+      } else if (vd->getType()->isFloatingType()) {
+        if(counting) {
+         count++;
+         return;
+       } else {
+          count++;
+          if(count != choose) {
+           return;
+          }
+        }
+        str = vd->getNameAsString() + " = 15.3;//wrong value\n//";
+      } else {
+        return;
+      }
+
+      SourceLocation sl = bo->getSourceRange().getBegin();
+    
+      SourceLocation des = sl;
+      while (Lexer::findLocationAfterToken(des, tok::semi, Rewrite.getSourceMgr(), 
                                     Rewrite.getLangOpts(), true).isInvalid()) {
           //des = Lexer::getLocForEndOfToken(sl, 0, Rewrite.getSourceMgr(), Rewrite.getLangOpts());
           des = des.getLocWithOffset(-1);
-        }
-        des = Lexer::findLocationAfterToken(des, tok::semi, Rewrite.getSourceMgr(), 
+      }
+      des = Lexer::findLocationAfterToken(des, tok::semi, Rewrite.getSourceMgr(), 
                                     Rewrite.getLangOpts(), true); 
-      std::string str = vd->getType().getAsString() + " " + vd->getNameAsString() + 
-      " = " + varValue + "; // init var \n"
-        + "// Missing init var " + vd->getNameAsString() + ": ";
-
-      //std::cout << "fun: " <<str<< std::endl;
+      
 
       Rewrite.InsertTextAfter(des, str);
     
@@ -63,8 +91,9 @@ public:
     MyASTConsumer(Rewriter &R) : VD(R) {
 
     
-        Matcher.addMatcher(varDecl(hasName(varName)).bind("vd"),&VD);
-        //ignoringImpCasts(declRefExpr(to(functionDecl().bind("fun2"))));
+        Matcher.addMatcher(binaryOperator(hasOperatorName("="),
+                                          hasLHS(ignoringParenImpCasts(declRefExpr(to(
+                                               varDecl().bind("vd")))))).bind("bo"),&VD); 
     }
     
     void HandleTranslationUnit(ASTContext &Context) override {
@@ -83,6 +112,7 @@ class MyFrontendAction : public ASTFrontendAction {
 public:
     MyFrontendAction() {}
     void EndSourceFileAction() override {
+        if(counting) return;
         TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
         .write(llvm::outs());
     }
@@ -98,12 +128,18 @@ private:
 };
 
 int main(int argc, const char **argv) {
+    /*
     std::cout << "Enter variable name: " << std::endl;
     std::getline (std::cin,varName);
-    std::cout << "Enter new value: " << std::endl;
-    std::getline (std::cin,varValue);
+    */
     CommonOptionsParser op(argc, argv, MatcherSampleCategory);
     ClangTool Tool(op.getCompilations(), op.getSourcePathList());
+    Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
     
+    counting = false;
+    srand(time(NULL));
+    choose = rand() % count + 1;
+    count = 0;
+
     return Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
 }
