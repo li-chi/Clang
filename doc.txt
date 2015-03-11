@@ -26,7 +26,7 @@ MLC -> if(a&&b)，去掉&&b;
 MLPA -> 随便去掉一句赋值语句等不会出compile错的句子;
 
 WVAV -> Assignment a random num in assignment;
-only works for int and float;
+only works for int and float, assign specific num;
 
 WPFV -> change, 有symbol table!! 去table随机找个var;
 
