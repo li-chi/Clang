@@ -1,5 +1,11 @@
-MFC -> 少一个function
-MVIV -> =后是value，去掉；
+Progress
+
+MFC -> delete a random function;
+sucess, using //
+
+MVIV -> delete the init value of a varDecl;
+sucess, using //
+
 MVAV -> 赋值语句，=后是value，去掉;
 MVAE -> 赋值语句，=后是expr，去掉;
 MIA -> if (a) b, -> 去掉if a;
