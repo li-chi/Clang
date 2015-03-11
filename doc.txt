@@ -19,6 +19,8 @@ MIFS -> if (a) b -> delete all;
 success, but comment all when has nested if statement inside
 
 MIEB -> if(a) b else (c) d，only leave d;
+see above
+
 MLC -> if(a&&b)，去掉&&b;
 MLPA -> 随便去掉一句赋值语句等不会出compile错的句子;
 WVAV -> 给随机的赋值语句改的数;

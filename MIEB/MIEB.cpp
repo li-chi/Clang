@@ -13,7 +13,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "clang/Lex/lexer.h"
 #include "clang/Lex/Token.h"
-
+#include <stdlib.h>  
 
 using namespace clang;
 using namespace clang::ast_matchers;
@@ -22,8 +22,9 @@ using namespace clang::tooling;
 
 static llvm::cl::OptionCategory MatcherSampleCategory("Matcher Sample");
 
-std::string funName;
-
+bool counting = true;
+int count = 0;
+int choose;
 
 class IfHandler : public MatchFinder::MatchCallback {
 public:
@@ -32,6 +33,15 @@ public:
     virtual void run(const MatchFinder::MatchResult &Result) {
       const IfStmt *ifStmt = Result.Nodes.getNodeAs<IfStmt>("if");
       if (const Stmt *elseStmt = ifStmt->getElse()) {
+        if(counting) {
+          count++;
+          return;
+        } else {
+          count++;
+          if(count != choose) {
+            return;
+          }
+        }
         SourceLocation sl = ifStmt->getLocStart();
         std::string str = "/* missing if construct plus statement puls else:\n";
         Rewrite.InsertTextAfter(sl, str);
@@ -74,6 +84,7 @@ class MyFrontendAction : public ASTFrontendAction {
 public:
     MyFrontendAction() {}
     void EndSourceFileAction() override {
+        if(counting) return;
         TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
         .write(llvm::outs());
     }
@@ -92,5 +103,13 @@ int main(int argc, const char **argv) {
     CommonOptionsParser op(argc, argv, MatcherSampleCategory);
     ClangTool Tool(op.getCompilations(), op.getSourcePathList());
     
+    Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
+    
+    counting = false;
+    srand(time(NULL));
+    choose = rand() % count + 1;
+    count = 0;
+
+
     return Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
 }
