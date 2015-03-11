@@ -1,17 +1,23 @@
 Progress
 
 MFC -> delete a random function;
-sucess, using //
+success, using //
 
 MVIV -> delete the init value of a varDecl;
-sucess, using //
+success, using //
 
 MVAV -> delete the value assginemnt with RHS value;
-delete assignment, ignoring value or expr
+delete assignment, ignoring value or expr;
 
 MVAE -> delete the value assginemnt with RHS value;
+see above;
+
 MIA -> if (a) b, ->  delete f a;
+success
+
 MIFS -> if (a) b -> delete all;
+success, but comment all when has nested if statement inside
+
 MIEB -> if(a) b else (c) d，only leave d;
 MLC -> if(a&&b)，去掉&&b;
 MLPA -> 随便去掉一句赋值语句等不会出compile错的句子;
