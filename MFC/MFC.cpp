@@ -13,6 +13,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "clang/Lex/lexer.h"
 #include "clang/Lex/Token.h"
+#include <stdlib.h>  
 
 
 using namespace clang;
@@ -22,14 +23,26 @@ using namespace clang::tooling;
 
 static llvm::cl::OptionCategory MatcherSampleCategory("Matcher Sample");
 
-std::string funName;
-
+bool counting = true;
+int count = 0;
+int choose;
 
 class FunctionCallHandler : public MatchFinder::MatchCallback {
 public:
     FunctionCallHandler(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
     virtual void run(const MatchFinder::MatchResult &Result) {
+
+      if(counting) {
+        count++;
+        return;
+      } else {
+        count++;
+        if(count != choose) {
+          return;
+        }
+      }
+
       const CallExpr *expr = Result.Nodes.getNodeAs<CallExpr>("callExpr");
       const FunctionDecl *decl = Result.Nodes.getNodeAs<FunctionDecl>("funDecl");
       SourceLocation sl = expr->getSourceRange().getBegin();
@@ -62,7 +75,7 @@ public:
     MyASTConsumer(Rewriter &R) : Fun(R) {
 
     
-        Matcher.addMatcher(callExpr(callee(functionDecl(hasName(funName)).bind("funDecl"))).bind("callExpr"),&Fun);
+        Matcher.addMatcher(callExpr(callee(functionDecl().bind("funDecl"))).bind("callExpr"),&Fun);
         //ignoringImpCasts(declRefExpr(to(functionDecl().bind("fun2"))));
     }
     
@@ -82,6 +95,7 @@ class MyFrontendAction : public ASTFrontendAction {
 public:
     MyFrontendAction() {}
     void EndSourceFileAction() override {
+        if(counting) return;
         TheRewriter.getEditBuffer(TheRewriter.getSourceMgr().getMainFileID())
         .write(llvm::outs());
     }
@@ -97,10 +111,16 @@ private:
 };
 
 int main(int argc, const char **argv) {
+    /*
     std::cout << "Enter function call name: " << std::endl;
     std::getline (std::cin,funName);
+    */
     CommonOptionsParser op(argc, argv, MatcherSampleCategory);
     ClangTool Tool(op.getCompilations(), op.getSourcePathList());
-    
+    Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
+    counting = false;
+    srand(time(NULL));
+    choose = rand() % count + 1;
+    count = 0;
     return Tool.run(newFrontendActionFactory<MyFrontendAction>().get());
 }
