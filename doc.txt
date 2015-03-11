@@ -6,11 +6,13 @@ sucess, using //
 MVIV -> delete the init value of a varDecl;
 sucess, using //
 
-MVAV -> 赋值语句，=后是value，去掉;
-MVAE -> 赋值语句，=后是expr，去掉;
-MIA -> if (a) b, -> 去掉if a;
-MIFS -> if (a) b -> 全去掉;
-MIEB -> if(a) b else (c) d，只留d;
+MVAV -> delete the value assginemnt with RHS value;
+delete assignment, ignoring value or expr
+
+MVAE -> delete the value assginemnt with RHS value;
+MIA -> if (a) b, ->  delete f a;
+MIFS -> if (a) b -> delete all;
+MIEB -> if(a) b else (c) d，only leave d;
 MLC -> if(a&&b)，去掉&&b;
 MLPA -> 随便去掉一句赋值语句等不会出compile错的句子;
 WVAV -> 给随机的赋值语句改的数;
