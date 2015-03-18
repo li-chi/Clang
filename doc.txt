@@ -8,27 +8,34 @@ success, using //
 
 MVAV -> delete the value assginemnt with RHS value;
 delete assignment, ignoring value or expr;
+using literal
 
 MVAE -> delete the value assginemnt with RHS value;
 see above;
 
-MIA -> if (a) b, ->  delete f a;
+MIA -> if (a) b, ->  delete if a;
 success
 
 MIFS -> if (a) b -> delete all;
-success, but comment all when has nested if statement inside
+success
 
 MIEB -> if(a) b else (c) d，only leave d;
-see above
+success
 
 MLC -> if(a&&b)，去掉&&b;
 
 MLPA -> 随便去掉一句赋值语句等不会出compile错的句子;
+success
 
 WVAV -> Assignment a random num in assignment;
-only works for int and float, assign specific num;
+only works for int and float, assign specific num; -> random num
 
-WPFV -> change, 有symbol table!! 去table随机找个var;
+WPFV -> use another var for the para in the fun
+1. count the num of funtion with para
+2. random choose one -> random choose one para
+3. find all varDecl before the choosing function
+4. random choose one var
+5. replace the choose var with the choosing para
 
 WAEP -> f(a+b) —>> f(a) or f(a-b)…
 
