@@ -12,7 +12,7 @@ using literal
 success
 
 MVAE -> delete the value assginemnt with RHS value;
-see above;
+success
 
 MIA -> if (a) b, ->  delete if a;
 success
