@@ -74,7 +74,10 @@ public:
     MyASTConsumer(Rewriter &R) : VD(R) {
 
     
-        Matcher.addMatcher(binaryOperator(hasOperatorName("=")).bind("bo"),&VD);
+        Matcher.addMatcher(binaryOperator(hasOperatorName("="),
+          hasRHS(integerLiteral())).bind("bo"),&VD);
+        Matcher.addMatcher(binaryOperator(hasOperatorName("="),
+          hasRHS(floatLiteral())).bind("bo"),&VD);
     }
     
     void HandleTranslationUnit(ASTContext &Context) override {

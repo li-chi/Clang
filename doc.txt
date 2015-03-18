@@ -9,6 +9,7 @@ success, using //
 MVAV -> delete the value assginemnt with RHS value;
 delete assignment, ignoring value or expr;
 using literal
+success
 
 MVAE -> delete the value assginemnt with RHS value;
 see above;
