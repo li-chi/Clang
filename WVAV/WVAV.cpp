@@ -46,7 +46,9 @@ public:
             return;
           }
         }
-        str = vd->getNameAsString() + " = 10;//wrong value\n//";
+        srand(time(NULL));
+        int r = rand() % 1000;
+        str = vd->getNameAsString() + " = " + std::to_string(r) + ";//wrong value\n//";
 
       } else if (vd->getType()->isFloatingType()) {
         if(counting) {
@@ -58,7 +60,9 @@ public:
            return;
           }
         }
-        str = vd->getNameAsString() + " = 15.3;//wrong value\n//";
+        srand(time(NULL));
+        int r = rand() & 1000;
+        str = vd->getNameAsString() + " = " + std::to_string(r) + ".0;//wrong value\n//";
       } else {
         return;
       }

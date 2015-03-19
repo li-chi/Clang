@@ -7,12 +7,10 @@ MVIV -> delete the init value of a varDecl;
 success, using //
 
 MVAV -> delete the value assginemnt with RHS value;
-delete assignment, ignoring value or expr;
-using literal
-success
+success //new using floatLiteral & IntegerLiteral
 
 MVAE -> delete the value assginemnt with RHS value;
-success
+success //new using callExpr & binaryOperator
 
 MIA -> if (a) b, ->  delete if a;
 success
@@ -24,12 +22,13 @@ MIEB -> if(a) b else (c) d，only leave d;
 success
 
 MLC -> if(a&&b)，去掉&&b;
+success //new
 
 MLPA -> 随便去掉一句赋值语句等不会出compile错的句子;
 success
 
 WVAV -> Assignment a random num in assignment;
-only works for int and float, assign specific num; -> random num
+success //new a random 0~999 assigned to float or int
 
 WPFV -> use another var for the para in the fun
 1. count the num of funtion with para
@@ -39,5 +38,5 @@ WPFV -> use another var for the para in the fun
 5. replace the choose var with the choosing para
 
 WAEP -> f(a+b) —>> f(a) or f(a-b)…
-success
+success //new
 
