@@ -31,36 +31,30 @@ public:
     IfHandler(Rewriter &Rewrite) : Rewrite(Rewrite) {}
 
     virtual void run(const MatchFinder::MatchResult &Result) {
-      const IfStmt *ifStmt = Result.Nodes.getNodeAs<IfStmt>("if");
 
-      if(ifStmt->getElse()) return;
-      else {
-        if(counting) {
-          count++;
+      const BinaryOperator *bo = Result.Nodes.getNodeAs<BinaryOperator>("bo");
+      printf("found\n\n");
+
+      
+      if(counting) {
+        count++;
+        return;
+      } else {
+        count++;
+        if(count != choose) {
           return;
-        } else {
-          count++;
-          if(count != choose) {
-            return;
-          }
         }
-
-        SourceLocation sl = ifStmt->getLocStart();
-        std::string str = "/* missing if construct:\n";
-        Rewrite.InsertTextAfter(sl, str);
-        const Expr *cond = ifStmt->getCond();
-        sl = cond->getLocEnd();
-        SourceLocation des = sl;
-        while (Lexer::findLocationAfterToken(des, tok::r_paren, Rewrite.getSourceMgr(), 
-                                    Rewrite.getLangOpts(), true).isInvalid()) {
-          //des = Lexer::getLocForEndOfToken(sl, 0, Rewrite.getSourceMgr(), Rewrite.getLangOpts());
-          des = des.getLocWithOffset(-1);
-        }
-        des = Lexer::findLocationAfterToken(des, tok::r_paren, Rewrite.getSourceMgr(), 
-                                    Rewrite.getLangOpts(), true); 
-        str = " end */";
-        Rewrite.InsertTextAfter(des, str);
       }
+
+      SourceLocation sl = bo->getOperatorLoc();
+      std::string str = "/* missing clause: ";
+      Rewrite.InsertTextAfter(sl, str);
+
+      sl = bo->getLocEnd();
+      sl = sl.getLocWithOffset(1);
+      str = " */";
+      Rewrite.InsertTextAfter(sl, str);
+        
       
     }
     
@@ -77,7 +71,9 @@ public:
 
         
         Matcher.addMatcher(ifStmt(hasCondition(binaryOperator(
-                                                               hasOperatorName("&&")))).bind("if"),&Handler);
+                                                               hasOperatorName("&&")).bind("bo"))),&Handler);
+        Matcher.addMatcher(ifStmt(hasCondition(binaryOperator(
+                                                               hasOperatorName("||")).bind("bo"))),&Handler);
         //ignoringImpCasts(declRefExpr(to(functionDecl().bind("fun2"))));
     }
     
