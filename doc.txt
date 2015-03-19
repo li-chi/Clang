@@ -39,4 +39,5 @@ WPFV -> use another var for the para in the fun
 5. replace the choose var with the choosing para
 
 WAEP -> f(a+b) —>> f(a) or f(a-b)…
+success
 
